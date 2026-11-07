@@ -1,17 +1,21 @@
 <template>
 	<!--
-		非受控输入（彻底解决中文输入法被打断）：
-		照搬已验证可用的 tb-searchbar 思路——
-		原生 <input> 在打字期间自行掌管 value；组件只在「外部/父组件主动改值」时
-		用 :key 重建输入框，正常打字绝不改 :value、绝不重建、绝不丢焦点。
-		之前版本在 onInput 里把绑定值也改了，等于又变回受控回写，
-		导致 uni-app 在拼音组合期间重置 DOM → 又打不了中文。这版彻底改回非受控。
+		中文输入法（IME）安全输入框 —— 组合守卫 + 受控同步（终极修法）：
+		1) :value="view" 受控绑定，保证「绑定值」始终最终等于输入框里的真实内容，
+		   不会被 uni-app 在重渲染时重置回旧值（这是“打了中文又消失”的根因）。
+		2) 拼音组合期间（compositionstart→compositionend）composing=true，
+		   此时【绝不】回写 view，把拼音缓冲完全交给系统输入法自己管，避免打断上屏。
+		3) 组合结束（compositionend）再把最终中文写回 view 并 emit。
+		   英文/数字没有组合态，onInput 里立即同步 view。
+		4) 仅父组件主动改值时（如「重置」按钮）用 :key 重建输入框。
 	-->
 	<input
 		:key="key"
-		:value="initialValue"
+		:value="view"
 		placeholder-class="tb-ph"
 		@input="onInput"
+		@compositionstart="composing = true"
+		@compositionend="onCompositionEnd"
 		@confirm="onConfirm"
 		@blur="onBlur"
 		@focus="onFocus"
@@ -25,11 +29,11 @@
 			modelValue: { type: [String, Number], default: '' },
 			value: { type: [String, Number], default: '' }
 		},
-		emits: ['input', 'update:modelValue', 'update:value', 'change', 'confirm', 'blur', 'focus'],
+		emits: ['input', 'update:modelValue', 'update:value', 'change', 'confirm', 'blur', 'focus', 'compositionstart', 'compositionend'],
 		data() {
 			const v = (this.modelValue !== undefined && this.modelValue !== null) ? this.modelValue : this.value
 			const s = v == null ? '' : String(v)
-			return { initialValue: s, inner: s, key: 0 }
+			return { view: s, composing: false, pending: null, key: 0 }
 		},
 		watch: {
 			modelValue(v) { this.syncExternal(v) },
@@ -39,29 +43,39 @@
 			norm(v) { return v == null ? '' : String(v) },
 			syncExternal(v) {
 				const nv = this.norm(v)
-				// 自己刚 emit 出去的值会原样回来，此时绝不重建，避免打断 IME
-				if (nv === this.inner) return
-				this.inner = nv
-				this.initialValue = nv
-				this.key++          // 外部程序化改值才重建输入框（如「重置」按钮）
+				if (nv === this.view) return
+				// 组合进行中：先记下目标值，待 compositionend 再落地，避免打断上屏
+				if (this.composing) { this.pending = nv; return }
+				this.view = nv
+				this.key++
 			},
 			onInput(e) {
 				const v = (e && e.detail) ? e.detail.value : ''
-				this.inner = v
+				this.$emit('update:modelValue', v)
+				this.$emit('input', v)
+				this.$emit('update:value', v)
+				// 非组合态立即同步；组合态交给 compositionend，绝不中途回写打断输入法
+				if (!this.composing) this.view = v
+			},
+			onCompositionEnd(e) {
+				this.composing = false
+				const v = (e && e.detail) ? e.detail.value : this.view
+				this.view = v
+				// 组合期间若有外部改值，以外部为准
+				if (this.pending != null && this.pending !== v) { this.view = this.pending; this.key++ }
+				this.pending = null
 				this.$emit('update:modelValue', v)
 				this.$emit('input', v)
 				this.$emit('update:value', v)
 			},
-			onConfirm() { this.$emit('confirm', this.inner) },
-			onBlur() { this.$emit('blur', this.inner); this.$emit('change', this.inner) },
+			onConfirm() { this.$emit('confirm', this.view) },
+			onBlur() { this.$emit('blur', this.view); this.$emit('change', this.view) },
 			onFocus(e) { this.$emit('focus', e) }
 		}
 	}
 </script>
 
 <style scoped>
-	/* 让根 <input> 在任意父容器（含 flex）下都能正确撑开并显示文字。
-	   背景 / 边框 / 内边距等由父级传入的 .input 类负责；这里只补“不被压扁 + 文字可见”。 */
 	input {
 		width: 100%;
 		min-width: 0;
