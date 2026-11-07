@@ -200,7 +200,7 @@ const near = (name, got, want, tol = 1e-6) => ok(name + ' (' + got + ' ≈ ' + w
 	ok('搜索页改用 tb-input 非受控封装', search.includes('<tb-input') && search.includes('v-model="kw"'))
 	ok('搜索框补 min-width:0', bar.includes('min-width: 0') && tbInput.includes('min-width: 0'))
 	ok('搜索框补文字填充色', bar.includes('-webkit-text-fill-color') && tbInput.includes('-webkit-text-fill-color'))
-	ok('tb-input 输入即同步绑定值(中文 IME 安全)', tbInput.includes('onInput') && /this\.view\s*=/.test(tbInput) && !tbInput.includes('initial'))
+	ok('tb-input 非受控(中文 IME 安全)', tbInput.includes('initialValue') && tbInput.includes('onInput') && tbInput.includes('key++') && !tbInput.includes('this.view ='))
 	ok('全局输入框继承兜底', app.includes('uni-input input'))
 	ok('深色头图规则存在', app.includes('.page-dark .hero'))
 	ok('深色头图改深色渐变', /\.page-dark \.hero \{[\s\S]{0,200}#222b45/.test(app))

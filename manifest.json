@@ -6,6 +6,9 @@
     "versionCode": "220",
     "transformPx": false,
     "app-plus": {
+        "orientation": [
+            "portrait-primary"
+        ],
         "usingComponents": true,
         "nvueStyleCompiler": "uni-app",
         "compilerVersion": 3,

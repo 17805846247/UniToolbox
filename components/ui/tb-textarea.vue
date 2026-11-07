@@ -1,18 +1,16 @@
 <template>
 	<!--
-		非受控文本域（与 tb-input 同款修复）：绑定值 view 始终跟随 DOM 内容，
-		重渲染时 uni-app 不会把已输入的中文重置掉。auto-height / show-confirm-bar
-		等原生属性透传到根 textarea 元素。原生 textarea 必须成对闭合。
+		非受控文本域（与 tb-input 同款修复，照搬已验证的 tb-searchbar 思路）：
+		打字期间原生 textarea 自行掌管 value，组件只在「外部/父组件主动改值」时
+		用 :key 重建。正常打字绝不改 :value、绝不重建、绝不丢焦点，中文输入法安全。
 	-->
 	<textarea
 		:key="key"
-		:value="view"
+		:value="initialValue"
 		placeholder-class="tb-ph"
 		@input="onInput"
 		@blur="onBlur"
-		@focus="onFocus"
-		@compositionstart="composing = true"
-		@compositionend="onCompositionEnd"></textarea>
+		@focus="onFocus"></textarea>
 </template>
 
 <script>
@@ -22,10 +20,11 @@
 			modelValue: { type: [String, Number], default: '' },
 			value: { type: [String, Number], default: '' }
 		},
-		emits: ['input', 'update:modelValue', 'update:value', 'change', 'blur', 'focus', 'compositionstart', 'compositionend'],
+		emits: ['input', 'update:modelValue', 'update:value', 'change', 'blur', 'focus'],
 		data() {
 			const v = (this.modelValue !== undefined && this.modelValue !== null) ? this.modelValue : this.value
-			return { view: v == null ? '' : String(v), composing: false, pending: null, key: 0 }
+			const s = v == null ? '' : String(v)
+			return { initialValue: s, inner: s, key: 0 }
 		},
 		watch: {
 			modelValue(v) { this.syncExternal(v) },
@@ -35,34 +34,19 @@
 			norm(v) { return v == null ? '' : String(v) },
 			syncExternal(v) {
 				const nv = this.norm(v)
-				if (nv === this.view) return
-				this.pending = nv
-				if (!this.composing) {
-					this.view = nv
-					this.key++
-				}
+				if (nv === this.inner) return
+				this.inner = nv
+				this.initialValue = nv
+				this.key++
 			},
 			onInput(e) {
-				const v = e.detail.value
-				this.view = v
+				const v = (e && e.detail) ? e.detail.value : ''
+				this.inner = v
 				this.$emit('update:modelValue', v)
 				this.$emit('input', v)
 				this.$emit('update:value', v)
 			},
-			onCompositionEnd(e) {
-				this.composing = false
-				const v = (e && e.detail) ? e.detail.value : this.view
-				this.view = v
-				if (this.pending != null && this.pending !== v) {
-					this.view = this.pending
-					this.key++
-				}
-				this.pending = null
-				this.$emit('update:modelValue', v)
-				this.$emit('input', v)
-				this.$emit('update:value', v)
-			},
-			onBlur() { this.$emit('blur', this.view); this.$emit('change', this.view) },
+			onBlur() { this.$emit('blur', this.inner); this.$emit('change', this.inner) },
 			onFocus(e) { this.$emit('focus', e) }
 		}
 	}

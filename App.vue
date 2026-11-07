@@ -2,10 +2,14 @@
 	import { applyTheme } from './utils/theme.js'
 
 	export default {
-		onLaunch: function() {
-			console.log('[口袋工具箱] App Launch')
-			applyTheme()
-			// #ifdef H5
+	onLaunch: function() {
+		console.log('[口袋工具箱] App Launch')
+		applyTheme()
+		// 锁定竖屏：避免手机轻微晃动就自动转横屏导致界面「跳动」
+		// #ifdef APP-PLUS
+		try { if (typeof plus !== 'undefined' && plus.screen && plus.screen.lockOrientation) plus.screen.lockOrientation('portrait-primary') } catch (e) {}
+		// #endif
+		// #ifdef H5
 			// 浏览器端全局快捷键：Ctrl / ⌘ + K 随时唤起全局检索
 			if (typeof window !== 'undefined' && window.addEventListener) {
 				window.addEventListener('keydown', function (e) {
