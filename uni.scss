@@ -1,0 +1,85 @@
+/**
+ * uni-app 内置常用样式变量（官方默认，保留以便兼容插件市场组件）
+ * 项目自身的设计令牌统一定义在 App.vue 的 CSS 变量中（浅色/深色两套）。
+ * 下面这些 SCSS 变量供需要预处理的样式使用，与 App.vue 的令牌保持同色。
+ */
+
+/* 行为相关颜色 */
+$uni-color-primary: #007aff;
+$uni-color-success: #4cd964;
+$uni-color-warning: #f0ad4e;
+$uni-color-error: #dd524d;
+
+/* 文字基本颜色 */
+$uni-text-color:#333;
+$uni-text-color-inverse:#fff;
+$uni-text-color-grey:#999;
+$uni-text-color-placeholder: #808080;
+$uni-text-color-disable:#c0c0c0;
+
+/* 背景颜色 */
+$uni-bg-color:#ffffff;
+$uni-bg-color-grey:#f8f8f8;
+$uni-bg-color-hover:#f1f1f1;
+$uni-bg-color-mask:rgba(0, 0, 0, 0.4);
+
+/* 边框颜色 */
+$uni-border-color:#c8c7cc;
+
+/* 文字尺寸 */
+$uni-font-size-sm:12px;
+$uni-font-size-base:14px;
+$uni-font-size-lg:16px;
+
+/* 图片尺寸 */
+$uni-img-size-sm:20px;
+$uni-img-size-base:26px;
+$uni-img-size-lg:40px;
+
+/* Border Radius */
+$uni-border-radius-sm: 2px;
+$uni-border-radius-base: 3px;
+$uni-border-radius-lg: 6px;
+$uni-border-radius-circle: 50%;
+
+/* 水平间距 */
+$uni-spacing-row-sm: 5px;
+$uni-spacing-row-base: 10px;
+$uni-spacing-row-lg: 15px;
+
+/* 垂直间距 */
+$uni-spacing-col-sm: 4px;
+$uni-spacing-col-base: 8px;
+$uni-spacing-col-lg: 12px;
+
+$uni-opacity-disabled: 0.3;
+
+/* 文章场景相关 */
+$uni-color-title: #2C405A;
+$uni-font-size-title:20px;
+$uni-color-subtitle: #555555;
+$uni-font-size-subtitle:26px;
+$uni-color-paragraph: #3F536E;
+$uni-font-size-paragraph:15px;
+
+/* ===== 口袋工具箱设计令牌（SCSS 侧，与 App.vue CSS 变量对应） =====
+   界面 2.0 起，运行时的唯一色彩来源是 App.vue 的 CSS 变量（含浅/深色两套）。
+   这里保留 SCSS 变量只为兼容插件市场组件；新增样式请优先使用 CSS 变量，
+   尤其是 --tone-* 分类语义色与 --sp-* 间距，避免再次出现两份色板。 */
+$tb-primary: #4f6ef7;
+$tb-primary-2: #7c5cf5;
+$tb-text: #1b2233;
+$tb-text-2: #5a6478;
+$tb-text-3: #98a0b3;
+$tb-line: #e8ecf5;
+$tb-bg: #f4f6fb;
+$tb-card: #ffffff;
+$tb-radius: 20rpx;
+$tb-radius-sm: 14rpx;
+
+/* 5 个分类语义色（与 App.vue --tone-* 浅色值一致） */
+$tb-tone-convert: #4f6ef7;
+$tb-tone-file: #16a06a;
+$tb-tone-life: #d9468a;
+$tb-tone-utility: #d97706;
+$tb-tone-network: #0284c7;

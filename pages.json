@@ -1,0 +1,99 @@
+{
+	"pages": [
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "口袋工具箱",
+				"enablePullDownRefresh": false
+			}
+		},
+		{
+			"path": "pages/category/category",
+			"style": {
+				"navigationBarTitleText": "全部工具"
+			}
+		},
+		{
+			"path": "pages/files/files",
+			"style": {
+				"navigationBarTitleText": "文件"
+			}
+		},
+		{
+			"path": "pages/mine/mine",
+			"style": {
+				"navigationBarTitleText": "我的"
+			}
+		},
+		{
+			"path": "pages/tool/tool",
+			"style": {
+				"navigationBarTitleText": "工具"
+			}
+		},
+		{
+			"path": "pages/editor/editor",
+			"style": {
+				"navigationBarTitleText": "编辑"
+			}
+		},
+		{
+			"path": "pages/intro/intro",
+			"style": {
+				"navigationBarTitleText": "欢迎使用",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/about/about",
+			"style": {
+				"navigationBarTitleText": "关于我们"
+			}
+		},
+		{
+			"path": "pages/search/search",
+			"style": {
+				"navigationBarTitleText": "搜索工具",
+				"enablePullDownRefresh": false
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "口袋工具箱",
+		"navigationBarBackgroundColor": "#ffffff",
+		"backgroundColor": "#f4f6fb"
+	},
+	"tabBar": {
+		"color": "#98a0b3",
+		"selectedColor": "#4f6ef7",
+		"borderStyle": "white",
+		"backgroundColor": "#ffffff",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"iconPath": "static/tab/home.png",
+				"selectedIconPath": "static/tab/home-on.png",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/category/category",
+				"iconPath": "static/tab/tools.png",
+				"selectedIconPath": "static/tab/tools-on.png",
+				"text": "工具"
+			},
+			{
+				"pagePath": "pages/files/files",
+				"iconPath": "static/tab/files.png",
+				"selectedIconPath": "static/tab/files-on.png",
+				"text": "文件"
+			},
+			{
+				"pagePath": "pages/mine/mine",
+				"iconPath": "static/tab/mine.png",
+				"selectedIconPath": "static/tab/mine-on.png",
+				"text": "我的"
+			}
+		]
+	}
+}
