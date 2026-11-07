@@ -17,8 +17,9 @@
 			</view>
 		</view>
 		<view class="card" v-if="!tool"><view class="empty">工具不存在，请返回首页重新选择</view></view>
+		<view class="card" v-else-if="tool.dev"><view class="empty">⚙️ 该工具（{{ tool.name }}）待开发中，敬请期待</view></view>
 
-		<tool-image v-if="key === 'image'" />
+		<tool-image v-else-if="key === 'image'" />
 		<tool-encoding v-else-if="key === 'encoding'" />
 		<tool-json v-else-if="key === 'json'" />
 		<tool-table v-else-if="key === 'table'" />

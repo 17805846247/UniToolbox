@@ -20,7 +20,7 @@ export const TOOLS = [
 	{ key: 'json', name: 'JSON 格式化', desc: '格式化 / 压缩 / 校验 / 转义', cat: 'convert', badge: '{}', color: '#10b981', abbr: 'jsongsh json', alias: 'json美化 校验 压缩 缩进', tags: 'json 格式化 压缩 校验' },
 	{ key: 'table', name: '数据格式互转', desc: 'JSON ↔ CSV ↔ YAML 表格互转', cat: 'convert', badge: '表', color: '#8b5cf6', abbr: 'sjgshz', alias: 'csv yaml excel 表格 数据', tags: 'csv yaml json 表格 数据' },
 	{ key: 'radix', name: '进制转换', desc: '2~36 进制互转，支持大数', cat: 'convert', badge: '16', color: '#0ea5e9', abbr: 'jzzh', alias: '二进制 十六进制 八进制 2 8 16', tags: '二进制 八进制 十六进制 进制' },
-	{ key: 'color', name: '颜色转换', desc: 'HEX / RGB / HSL 互转与预览', cat: 'convert', badge: '色', color: '#ec4899', abbr: 'yszh ys', alias: '取色器 色值 rgb hex hsl', tags: '颜色 hex rgb hsl 取色' },
+	{ key: 'color', name: '颜色转换', desc: 'HEX / RGB / HSL 互转与预览（开发中）', cat: 'convert', badge: '色', color: '#ec4899', abbr: 'yszh ys', alias: '取色器 色值 rgb hex hsl', tags: '颜色 hex rgb hsl 取色', dev: true },
 	{ key: 'timestamp', name: '时间戳转换', desc: 'Unix 时间戳与日期时间互转', cat: 'convert', badge: '钟', color: '#14b8a6', abbr: 'sjczh', alias: 'unix 时间戳 日期转时间戳', tags: '时间戳 unix 日期 时间' },
 	{ key: 'markdown', name: 'Markdown 预览', desc: '本地解析渲染，无需联网', cat: 'convert', badge: 'M↓', color: '#6366f1', abbr: 'mdyl md', alias: 'md 渲染 文档 预览', tags: 'markdown md 预览 渲染 html' },
 	{ key: 'url', name: 'URL 参数解析', desc: 'query ↔ 对象、编码解码与拼装', cat: 'convert', badge: '?&', color: '#0ea5e9', abbr: 'urlcsjx url', alias: '网址 参数 query 编解码 链接', tags: 'url 参数 query 编码 链接' },

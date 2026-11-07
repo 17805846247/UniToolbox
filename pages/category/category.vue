@@ -20,12 +20,13 @@
 		<block v-for="g in groups" :key="g.key">
 			<tb-section :title="g.name" :action="g.tools.length + ' 个'"></tb-section>
 			<view class="group">
-				<view class="list-row" v-for="t in g.tools" :key="t.key" @click="open(t)">
+				<view class="list-row" :class="{ 'is-dev': t.dev }" v-for="t in g.tools" :key="t.key" @click="open(t)">
 					<tb-badge :tool="t" size="md" />
 					<view class="list-main">
 						<view class="list-title">
 							{{ t.name }}
 							<text v-if="t.net" class="tag-net">联网</text>
+							<text v-if="t.dev" class="tag-dev">待开发</text>
 						</view>
 						<view class="list-sub">{{ t.desc }}</view>
 					</view>
@@ -107,8 +108,9 @@
 				try { uni.setStorageSync('utool_favs', this.favs) } catch (e) {}
 				toast(this.isFav(k) ? '已收藏' : '已取消')
 			},
-			open(t) {
-				try {
+		open(t) {
+			if (t && t.dev) { toast('该工具待开发中'); return }
+			try {
 					const r = uni.getStorageSync('utool_recent')
 					const old = Array.isArray(r) ? r : []
 					uni.setStorageSync('utool_recent', [t.key].concat(old.filter(k => k !== t.key)).slice(0, 8))

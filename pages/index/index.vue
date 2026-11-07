@@ -44,12 +44,12 @@
 
 		<tb-section title="常用工具" action="查看全部 ›" @action="goCategory('')">
 			<view class="grid2">
-				<view class="tile" v-for="t in featured" :key="t.key" @click="open(t)">
+				<view class="tile" :class="{ 'is-dev': t.dev }" v-for="t in featured" :key="t.key" @click="open(t)">
 					<view class="tile-top">
 						<tb-badge :tool="t" size="md" />
 						<view class="fav" @click.stop="toggleFav(t.key)">{{ isFav(t.key) ? '★' : '☆' }}</view>
 					</view>
-					<view class="tile-name">{{ t.name }}<text v-if="t.net" class="tag-net">联网</text></view>
+					<view class="tile-name">{{ t.name }}<text v-if="t.net" class="tag-net">联网</text><text v-if="t.dev" class="tag-dev">待开发</text></view>
 					<view class="tile-desc">{{ t.desc }}</view>
 				</view>
 			</view>
@@ -64,6 +64,7 @@
 	import { themeMixin } from '../../utils/theme.js'
 	import { CATEGORIES, TOOLS, toolsOf, isTabPage } from '../../utils/tools.js'
 	import { accentStyle } from '../../utils/visual.js'
+	import { toast } from '../../utils/ui.js'
 	import TbSection from '../../components/ui/tb-section.vue'
 	import TbBadge from '../../components/ui/tb-badge.vue'
 	import TbSearchbar from '../../components/ui/tb-searchbar.vue'
@@ -128,8 +129,9 @@
 				try { uni.setStorageSync('tb_cat_preset', key || 'all') } catch (e) {}
 				uni.switchTab({ url: '/pages/category/category' })
 			},
-			open(t) {
-				try {
+		open(t) {
+			if (t && t.dev) { toast('该工具待开发中'); return }
+			try {
 					const arr = [t.key].concat(this.recent.filter(k => k !== t.key)).slice(0, 8)
 					this.recent = arr
 					uni.setStorageSync('utool_recent', arr)

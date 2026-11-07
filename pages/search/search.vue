@@ -167,9 +167,10 @@
 			delWord(w) { this.history = removeHistory(w) },
 			clearAll() { this.history = clearHistory() },
 			openFirst() { if (this.kw && this.results.length) this.open(this.results[0]) },
-			open(t) {
-				if (!t) return
-				if (this.kw) pushHistory(this.kw)
+		open(t) {
+			if (!t) return
+			if (t.dev) { toast('该工具待开发中'); return }
+			if (this.kw) pushHistory(this.kw)
 				this.saveRecent(t.key)
 				const url = t.page || ('/pages/tool/tool?key=' + t.key)
 				if (isTabPage(url)) uni.switchTab({ url: t.page })

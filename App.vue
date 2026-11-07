@@ -160,6 +160,15 @@
 	/* 二维码 / 条码画布必须保持白底，否则扫不出来 */
 	.page-dark .qr-box { background: #ffffff !important; }
 
+	/* 待开发工具：卡片整体置灰，并加灰色角标 */
+	.is-dev { filter: grayscale(1); opacity: .55; }
+	.tag-dev {
+		display: inline-block; margin-left: 10rpx; padding: 2rpx 12rpx;
+		font-size: 19rpx; font-weight: 600; line-height: 1.4;
+		color: #ffffff; background: #9aa3b2; border-radius: 999rpx;
+		vertical-align: middle;
+	}
+
 	/* ===== 页面容器 ===== */
 	.page {
 		min-height: 100vh;
