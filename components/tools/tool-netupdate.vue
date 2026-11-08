@@ -15,7 +15,7 @@
 				<view class="btn btn-sm btn-ghost" @click="clearUrl">清空</view>
 			</view>
 			<view class="hint">版本文件是一个公开 JSON，格式示例：</view>
-			<view class="result">{"version":"2.2.0","note":"新增工具","url":"https://…/app.apk"}</view>
+			<view class="result">{"version":"2.2.1","note":"新增工具","url":"https://…/app.apk"}</view>
 			<view class="hint">留空时不做任何请求。此功能仅做版本比对，不会自动下载或安装 APK。</view>
 		</view>
 

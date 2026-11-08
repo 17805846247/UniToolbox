@@ -1,21 +1,29 @@
 <template>
 	<!--
-		中文输入法（IME）安全输入框 —— 组合守卫 + 受控同步（终极修法）：
-		1) :value="view" 受控绑定，保证「绑定值」始终最终等于输入框里的真实内容，
-		   不会被 uni-app 在重渲染时重置回旧值（这是“打了中文又消失”的根因）。
-		2) 拼音组合期间（compositionstart→compositionend）composing=true，
-		   此时【绝不】回写 view，把拼音缓冲完全交给系统输入法自己管，避免打断上屏。
-		3) 组合结束（compositionend）再把最终中文写回 view 并 emit。
-		   英文/数字没有组合态，onInput 里立即同步 view。
-		4) 仅父组件主动改值时（如「重置」按钮）用 :key 重建输入框。
+		中文输入法（IME）安全单行输入框 —— 完全非受控（与 tb-searchbar 同一范式）。
+
+		根因（此前 3 次修复失败的原因）：
+		  uni-app <input> 的 value 语义是「输入框的初始内容」，且 App/H5 端
+		  ignoreCompositionEvent 默认为 true —— 合成期间既不派发 input，
+		  也不派发 compositionstart / compositionend。所以：
+		    · 用 composition 事件做「组合守卫」是死代码，composing 恒为 false；
+		    · 一旦在 @input 里把值写回 :value（受控回写），Vue 重渲染会重设
+		      原生输入框内容，直接打断拼音组合 → 中文打不上 / 上屏即回滚。
+
+		正确做法（tb-searchbar 已在真机验证）：
+		  1) :value 绑定 initialValue，输入全程绝不改动；
+		  2) @input 只记录影子值 inner 并向外 emit，不回写、不重建；
+		  3) inner 用来识别「v-model 把自己 emit 出去的值原样回传」并忽略，
+		     否则每次输入都会触发 watch → key++ 重建输入框 → 同样打断 IME；
+		  4) 仅父组件主动改值（重置 / 随机 / 载入）时才更新 initialValue 并
+		     用 :key 重建输入框。
+		  5) 全程不依赖 composition 事件，因此对平台默认值不敏感。
 	-->
 	<input
 		:key="key"
-		:value="view"
+		:value="initialValue"
 		placeholder-class="tb-ph"
 		@input="onInput"
-		@compositionstart="composing = true"
-		@compositionend="onCompositionEnd"
 		@confirm="onConfirm"
 		@blur="onBlur"
 		@focus="onFocus"
@@ -26,14 +34,14 @@
 	export default {
 		name: 'TbInput',
 		props: {
-			modelValue: { type: [String, Number], default: '' },
-			value: { type: [String, Number], default: '' }
+			modelValue: { type: [String, Number], default: undefined },
+			value: { type: [String, Number], default: undefined }
 		},
-		emits: ['input', 'update:modelValue', 'update:value', 'change', 'confirm', 'blur', 'focus', 'compositionstart', 'compositionend'],
+		emits: ['input', 'update:modelValue', 'update:value', 'change', 'confirm', 'blur', 'focus'],
 		data() {
-			const v = (this.modelValue !== undefined && this.modelValue !== null) ? this.modelValue : this.value
-			const s = v == null ? '' : String(v)
-			return { view: s, composing: false, pending: null, key: 0 }
+			const raw = (this.modelValue !== undefined && this.modelValue !== null) ? this.modelValue : this.value
+			const s = raw == null ? '' : String(raw)
+			return { initialValue: s, inner: s, key: 0 }
 		},
 		watch: {
 			modelValue(v) { this.syncExternal(v) },
@@ -43,33 +51,21 @@
 			norm(v) { return v == null ? '' : String(v) },
 			syncExternal(v) {
 				const nv = this.norm(v)
-				if (nv === this.view) return
-				// 组合进行中：先记下目标值，待 compositionend 再落地，避免打断上屏
-				if (this.composing) { this.pending = nv; return }
-				this.view = nv
+				// 自己刚 emit 出去的值原样回来：绝不回写、绝不重建，避免打断 IME
+				if (nv === this.inner) return
+				this.inner = nv
+				this.initialValue = nv
 				this.key++
 			},
 			onInput(e) {
 				const v = (e && e.detail) ? e.detail.value : ''
-				this.$emit('update:modelValue', v)
-				this.$emit('input', v)
-				this.$emit('update:value', v)
-				// 非组合态立即同步；组合态交给 compositionend，绝不中途回写打断输入法
-				if (!this.composing) this.view = v
-			},
-			onCompositionEnd(e) {
-				this.composing = false
-				const v = (e && e.detail) ? e.detail.value : this.view
-				this.view = v
-				// 组合期间若有外部改值，以外部为准
-				if (this.pending != null && this.pending !== v) { this.view = this.pending; this.key++ }
-				this.pending = null
+				this.inner = v
 				this.$emit('update:modelValue', v)
 				this.$emit('input', v)
 				this.$emit('update:value', v)
 			},
-			onConfirm() { this.$emit('confirm', this.view) },
-			onBlur() { this.$emit('blur', this.view); this.$emit('change', this.view) },
+			onConfirm() { this.$emit('confirm', this.inner) },
+			onBlur() { this.$emit('blur', this.inner); this.$emit('change', this.inner) },
 			onFocus(e) { this.$emit('focus', e) }
 		}
 	}

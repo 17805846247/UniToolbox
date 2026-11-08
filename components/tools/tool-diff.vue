@@ -59,7 +59,7 @@
 			swap() { const t = this.a; this.a = this.b; this.b = t },
 			sample() {
 				this.a = 'name: 口袋工具箱\nversion: 1.0.0\noffline: true\ntools: 18'
-				this.b = 'name: 口袋工具箱\nversion: 2.2.0\noffline: true\nnetwork: optional\ntools: 49'
+				this.b = 'name: 口袋工具箱\nversion: 2.2.1\noffline: true\nnetwork: optional\ntools: 49'
 			}
 		}
 	}

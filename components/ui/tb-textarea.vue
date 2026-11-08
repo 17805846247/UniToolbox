@@ -1,16 +1,15 @@
 <template>
 	<!--
-		中文输入法安全文本域 —— 与 tb-input 同款组合守卫 + 受控同步：
-		拼音组合期间不回写 view（交给系统输入法），组合结束再落地；
-		英文/数字立即同步，保证重渲染不会把已输入内容重置回旧值。
+		中文输入法（IME）安全多行文本域 —— 与 tb-input 同一套「完全非受控」范式。
+		:value 绑定 initialValue，输入全程绝不回写；inner 影子值过滤 v-model
+		自身回传；仅父组件主动改值时才 key++ 重建。详见 tb-input.vue 注释。
+		不依赖 composition 事件（uni-app App/H5 默认 ignoreCompositionEvent=true）。
 	-->
 	<textarea
 		:key="key"
-		:value="view"
+		:value="initialValue"
 		placeholder-class="tb-ph"
 		@input="onInput"
-		@compositionstart="composing = true"
-		@compositionend="onCompositionEnd"
 		@blur="onBlur"
 		@focus="onFocus"></textarea>
 </template>
@@ -19,14 +18,14 @@
 	export default {
 		name: 'TbTextarea',
 		props: {
-			modelValue: { type: [String, Number], default: '' },
-			value: { type: [String, Number], default: '' }
+			modelValue: { type: [String, Number], default: undefined },
+			value: { type: [String, Number], default: undefined }
 		},
-		emits: ['input', 'update:modelValue', 'update:value', 'change', 'blur', 'focus', 'compositionstart', 'compositionend'],
+		emits: ['input', 'update:modelValue', 'update:value', 'change', 'blur', 'focus'],
 		data() {
-			const v = (this.modelValue !== undefined && this.modelValue !== null) ? this.modelValue : this.value
-			const s = v == null ? '' : String(v)
-			return { view: s, composing: false, pending: null, key: 0 }
+			const raw = (this.modelValue !== undefined && this.modelValue !== null) ? this.modelValue : this.value
+			const s = raw == null ? '' : String(raw)
+			return { initialValue: s, inner: s, key: 0 }
 		},
 		watch: {
 			modelValue(v) { this.syncExternal(v) },
@@ -36,29 +35,19 @@
 			norm(v) { return v == null ? '' : String(v) },
 			syncExternal(v) {
 				const nv = this.norm(v)
-				if (nv === this.view) return
-				if (this.composing) { this.pending = nv; return }
-				this.view = nv
+				if (nv === this.inner) return
+				this.inner = nv
+				this.initialValue = nv
 				this.key++
 			},
 			onInput(e) {
 				const v = (e && e.detail) ? e.detail.value : ''
-				this.$emit('update:modelValue', v)
-				this.$emit('input', v)
-				this.$emit('update:value', v)
-				if (!this.composing) this.view = v
-			},
-			onCompositionEnd(e) {
-				this.composing = false
-				const v = (e && e.detail) ? e.detail.value : this.view
-				this.view = v
-				if (this.pending != null && this.pending !== v) { this.view = this.pending; this.key++ }
-				this.pending = null
+				this.inner = v
 				this.$emit('update:modelValue', v)
 				this.$emit('input', v)
 				this.$emit('update:value', v)
 			},
-			onBlur() { this.$emit('blur', this.view); this.$emit('change', this.view) },
+			onBlur() { this.$emit('blur', this.inner); this.$emit('change', this.inner) },
 			onFocus(e) { this.$emit('focus', e) }
 		}
 	}

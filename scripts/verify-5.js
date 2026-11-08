@@ -200,7 +200,22 @@ const near = (name, got, want, tol = 1e-6) => ok(name + ' (' + got + ' ≈ ' + w
 	ok('搜索页改用 tb-input 非受控封装', search.includes('<tb-input') && search.includes('v-model="kw"'))
 	ok('搜索框补 min-width:0', bar.includes('min-width: 0') && tbInput.includes('min-width: 0'))
 	ok('搜索框补文字填充色', bar.includes('-webkit-text-fill-color') && tbInput.includes('-webkit-text-fill-color'))
-	ok('tb-input 组合守卫(中文 IME 安全)', tbInput.includes('composing') && tbInput.includes('compositionend') && tbInput.includes('!this.composing') && tbInput.includes('this.view =') && tbInput.includes('onInput'))
+	// 中文 IME 契约（v2.2.1 根因修复）：
+	// uni-app 的 ignoreCompositionEvent 默认 true，composition* 事件不触发，
+	// 且 value 语义为「初始内容」——受控回写会打断拼音组合。必须完全非受控。
+	const tbTextarea = read('components/ui/tb-textarea.vue')
+	const tbField = read('components/ui/tb-field.vue')
+	for (const [name, src] of [['tb-input', tbInput], ['tb-textarea', tbTextarea], ['tb-field', tbField]]) {
+		ok(name + ' :value 绑定稳定初始值', src.includes(':value="initialValue"'))
+		// 检测实际绑定语法，避免被说明性注释里的同名词干扰
+		ok(name + ' 不绑定 composition 事件', !src.includes('@compositionstart') && !src.includes('@compositionend'))
+		ok(name + ' 无 composing 状态字段/赋值', !/composing\s*:/.test(src) && !/composing\s*=/.test(src))
+		ok(name + ' 无受控回写', !src.includes('this.view') && !src.includes(':value="view"'))
+		ok(name + ' inner 影子值过滤 v-model 回传', src.includes('if (nv === this.inner) return'))
+		ok(name + ' 仅外部改值时重建', src.includes('this.key++') && src.includes(':key="key"'))
+	}
+	const mine = read('pages/mine/mine.vue')
+	ok('我的页 isGuest 已暴露到 methods（防白屏）', /methods\s*:\s*\{[\s\S]{0,300}?\bisGuest\b\s*,/.test(mine))
 	ok('全局输入框继承兜底', app.includes('uni-input input'))
 	ok('深色头图规则存在', app.includes('.page-dark .hero'))
 	ok('深色头图改深色渐变', /\.page-dark \.hero \{[\s\S]{0,200}#222b45/.test(app))

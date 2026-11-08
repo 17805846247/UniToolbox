@@ -1,27 +1,25 @@
 {
-    "name": "口袋工具箱",
-    "appid": "__UNI__1E20DA8",
-    "description": "口袋工具箱 2.2：49 个实用工具（44 个纯离线）+ 可选联网能力，统一分类视觉、全局快速检索、深色 tabBar、非受控输入（中文输入法不再被打断）、游客账号与文件云端备份（uni-app / Android）",
-    "versionName": "2.2.0",
-    "versionCode": "220",
-    "transformPx": false,
-    "app-plus": {
-        "orientation": [
-            "portrait-primary"
-        ],
-        "usingComponents": true,
-        "nvueStyleCompiler": "uni-app",
-        "compilerVersion": 3,
-        "splashscreen": {
-            "alwaysShowBeforeRender": true,
-            "waiting": true,
-            "autoclose": true,
-            "delay": 0
+    "name" : "口袋工具箱",
+    "appid" : "__UNI__1E20DA8",
+    "description" : "口袋工具箱 2.2：49 个实用工具（44 个纯离线）+ 可选联网能力，统一分类视觉、全局快速检索、深色 tabBar、非受控输入（中文输入法不再被打断）、游客账号与文件云端备份（uni-app / Android）",
+    "versionName" : "2.2.1",
+    "versionCode" : "221",
+    "transformPx" : false,
+    "app-plus" : {
+        "orientation" : [ "portrait-primary" ],
+        "usingComponents" : true,
+        "nvueStyleCompiler" : "uni-app",
+        "compilerVersion" : 3,
+        "splashscreen" : {
+            "alwaysShowBeforeRender" : true,
+            "waiting" : true,
+            "autoclose" : true,
+            "delay" : 0
         },
-        "modules": {},
-        "distribute": {
-            "android": {
-                "permissions": [
+        "modules" : {},
+        "distribute" : {
+            "android" : {
+                "permissions" : [
                     "<uses-permission android:name=\"android.permission.INTERNET\"/>",
                     "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
                     "<uses-permission android:name=\"android.permission.VIBRATE\"/>",
@@ -29,19 +27,19 @@
                     "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>"
                 ]
             },
-            "ios": {
-                "dSYMs": false
+            "ios" : {
+                "dSYMs" : false
             },
-            "sdkConfigs": {}
+            "sdkConfigs" : {}
         }
     },
-    "quickapp": {},
-    "mp-weixin": {
-        "appid": "",
-        "setting": {
-            "urlCheck": false
+    "quickapp" : {},
+    "mp-weixin" : {
+        "appid" : "",
+        "setting" : {
+            "urlCheck" : false
         },
-        "usingComponents": true
+        "usingComponents" : true
     },
-    "vueVersion": "3"
+    "vueVersion" : "3"
 }

@@ -91,7 +91,7 @@
 			<view class="hint" style="margin: 16rpx 8rpx">不会删除文件管理器里的文件、编辑器草稿、主题与联网设置。</view>
 		</tb-section>
 
-		<view class="copyright">口袋工具箱 v2.2.0 · 主开发 WorkBuddy AI 助手 · 协作开发 Ezer Zheng</view>
+		<view class="copyright">口袋工具箱 v2.2.1 · 主开发 WorkBuddy AI 助手 · 协作开发 Ezer Zheng</view>
 		<view class="safe-bottom"></view>
 	</view>
 </template>
@@ -132,6 +132,10 @@
 			this.account = getAccount()
 		},
 		methods: {
+			// 模板里调用了 isGuest(account)。Vue3 Options API 的模板只能访问组件实例属性，
+			// 单纯 import 的函数不会自动暴露，不挂到 methods 会在渲染时抛
+			// "isGuest is not a function" 并导致整页白屏。
+			isGuest,
 			changeTheme(k) {
 				this.themeMode = setThemeMode(k)
 				toast('已切换为' + (this.themeOptions.find(x => x.key === k) || {}).name)

@@ -4,8 +4,20 @@
 
 - 项目目录：`C:\Users\Administrator\Documents\HBuilderProjects\UniToolbox`
 - 与本机已有项目「我的app」同目录、同 HBuilderX 版本（5.34 / uni-app Vue3），直接可用
-- 应用名称：口袋工具箱 · 版本 **2.2.0**（versionCode 220）· AppID `__UNI__1E20DA8`
+- 应用名称：口袋工具箱 · 版本 **2.2.1**（versionCode 221）· AppID `__UNI__1E20DA8`
 - **主开发：WorkBuddy AI 助手** · **协作开发：Ezer Zheng** · 联系邮箱：`17805846247@163.com`
+
+## 2.2.1 修了什么（真机实测问题）
+
+| 现象 | 根因 | 修复 |
+| --- | --- | --- |
+| **进制转换、颜色转换等单行输入框仍然打不了中文**（2.2.0 修过 3 次仍复现） | uni-app 的 `input` 组件 `ignoreCompositionEvent` 默认 `true` —— App/H5 端 `compositionstart`/`compositionend` **根本不触发**，2.2.0 的「组合守卫」里 `composing` 恒为 `false`，是死代码；于是 `onInput` 每次都把值写回 `:value`。而 uni-app `value` 的语义是「输入框的初始内容」，受控回写会重设原生输入框 → 打断拼音组合 | 彻底改为**完全非受控**：`:value` 绑定 `initialValue`，输入全程不回写、不重建；用 `inner` 影子值识别并忽略 `v-model` 自身回传（否则每次回传都会 `key++` 重建，同样打断 IME）；仅父组件主动改值（重置 / 随机 / 载入）时才更新 `initialValue` 并 `:key` 重建。`tb-input` / `tb-textarea` / `tb-field` 统一到与已验证可用的 `tb-searchbar` 同一范式 |
+| **点开「我的」整页白屏** | `mine.vue` 模板 5 处调用 `isGuest(account)`，但 `isGuest` 只是从 `utils/account.js` import 的模块函数。Vue3 Options API 的模板只能访问组件实例属性，import 的函数不会自动暴露 → 渲染时抛 `isGuest is not a function`，整页渲染中断 | 把 `isGuest` 挂到 `methods`（简写属性），模板调用即可解析 |
+
+新增 `scripts/verify-6.js` 行为级回归：
+- 直接加载真实组件 `<script>`，模拟「拼音逐字 → 中文上屏 → `v-model` 回传 → 外部改值」全流程，断言输入期间 `:value` 与 `:key` **始终不变**；
+- 把 `mine.vue` 全部 24 条模板表达式在模拟实例上逐条求值，任何未暴露标识符都会像真机一样抛 `ReferenceError`；
+- 两个断言都带**反向自检**，防止验证脚本自身退化成假阴性（2.2.0 的 `verify-5` 曾把错误的组合守卫实现写成"必须包含 `compositionend`"，导致错误方案一直测试通过）。
 
 ## 2.2 修了什么、加了什么
 
@@ -162,12 +174,12 @@ UniToolbox/
 2. 纯计算逻辑放 `utils/` 下的模块，保持不依赖 uni 以便单测。
 3. 新建 `components/tools/tool-你的key.vue`，用全局 `.card / .btn / .chip / .result` 或 `components/ui/` 组件写界面；徽标用 `<tb-badge :tool="tool" />`；联网工具用 `<tb-net-gate>` 包起来。
 4. 在 `pages/tool/tool.vue` 顶部 import、注册，并加一行 `<tool-你的key v-else-if="key === '你的key'" />`。
-5. 跑 `node scripts/verify.js && node scripts/verify-new.js && node scripts/verify-3.js && node scripts/verify-4.js && node scripts/verify-5.js`，校验脚本会自动检查组件、挂载、检索元数据、界面契约与版本号。
+5. 跑 `for f in scripts/verify*.js; do node "$f" || break; done`，校验脚本会自动检查组件、挂载、检索元数据、界面契约、版本号与 IME / 白屏回归。
 
-## 已做的验证（v2.2.0）
+## 已做的验证（v2.2.1）
 
-- **65 个 `.vue` 文件**的 `<script>` 语法与模板标签配对检查通过；9 个页面、49 个工具、47 个工具组件注册与挂载一一对应（无缺组件 / 无未挂载 / 无多余组件）。
-- **477 项校验全通过**：73 项原有零回归 + 89 项 v1.1 单测 + 149 项 v1.2 单测 + 39 项 2.0 界面契约 + **127 项 2.1 新增**（智能识别 40+ 用例、Cron 未来时间推算与 8 个预设、密码强度、摩斯全表往返、AA 分账整数分校验、三处 bug 修复契约）。
+- **67 个 `.vue` 文件**的 `<script>` 语法与模板标签配对检查通过；9 个页面、49 个工具、47 个工具组件注册与挂载一一对应（无缺组件 / 无未挂载 / 无多余组件）。
+- **627 项校验全通过**：73 项原有零回归 + 89 项 v1.1 单测 + 149 项 v1.2 单测 + 43 项 2.0 界面契约 + 146 项 2.1/IME 契约 + **127 项 v2.2.1 IME 与白屏行为级回归**（智能识别 40+ 用例、Cron 未来时间推算与 8 个预设、密码强度、摩斯全表往返、AA 分账整数分校验）。
 - 农历 **240 个日期与 Node ICU 逐日比对一致**；MD5/SHA-1/SHA-256 与 Node.js `crypto` 标准库逐例一致；二维码矩阵与 HBuilderX 自带 QRCode 原库逐像素一致。
 - HBuilderX 5.34 实测编译：`publish web` 全量发行 + `launch app-android --compile` **双端编译通过**。
 - 8 张 tabBar 图标为合法 81×81 PNG；`manifest.json` / `pages.json` JSON 校验通过。

@@ -95,7 +95,7 @@
 	import TbBtn from '../../components/ui/tb-btn.vue'
 
 	const EMAIL = '17805846247@163.com'
-	const VERSION = '2.2.0'
+	const VERSION = '2.2.1'
 
 	export default {
 		components: { TbCard, TbBtn },
